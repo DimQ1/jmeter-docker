@@ -1,0 +1,58 @@
+version: "3.7"
+services:
+  apache-jmeter-base:
+    image: apache-jmeter-base
+    build:
+      context: .
+      dockerfile: ./jmeter-base/Dockerfile
+  master:
+    image: ajeetraina/apache-jmeter-master
+    depends_on:
+      - apache-jmeter-base
+    build:
+      context: .
+      dockerfile: ./apache-jmeter-master/Dockerfile
+    tty: true
+    ports:
+      - "60000"
+    volumes:
+      - "./testdata/:/jmeter/testdata/"
+    networks:
+      - jm-network
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 3
+        window: 120s
+      placement:
+          constraints: [node.role == manager]
+  slave:
+    image: ajeetraina/apache-jmeter-server
+    depends_on:
+      - apache-jmeter-base
+      - master
+    build:
+      context: .
+      dockerfile: ./apache-jmeter-server/Dockerfile
+    tty: true
+    networks:
+      - jm-network
+    ports:
+      - "50001"
+      - "1099"
+    volumes:
+      - "./testdata/:/jmeter/testdata/"
+    deploy:
+      mode: global
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 3
+        window: 120s
+      placement:
+        constraints: [node.role == worker]
+
+networks:
+  jm-network:
