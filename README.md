@@ -1,9 +1,6 @@
 # jmeter-docker
 <b> Save nessesary files in folder
-  testdata\
-         logs
-         plans
-         datasets
+  testdata->(logs; plans; datasets)
 
 <b> Start docker
   
