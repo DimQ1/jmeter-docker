@@ -28,6 +28,9 @@ services:
         window: 120s
       placement:
           constraints: [node.role == manager]
+    command: >
+      jmeter -n -t /jmeter/testdata/plans/tests.jmx -l /jmeter/testdata/logs/log.jtl -j /jmeter/testdata/logs/jlog.log  -R jmeter-docker_slave_1
+
   slave:
     image: max/apache-jmeter-server
     depends_on:
